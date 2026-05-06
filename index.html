@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Импорт — Журнал менеджеров</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #fffcec;
+      font-family: 'Roboto', Helvetica, sans-serif;
+      min-height: 100vh;
+      overflow-x: auto;
+    }
+
+    /* ================================================================
+       MAIN NAV — primary yellow/gold bar with 6 tabs
+    ================================================================ */
+    .main-nav {
+      background: linear-gradient(to bottom, #e8c800 0%, #d4b400 100%);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .main-nav::-webkit-scrollbar { display: none; }
+
+    .main-nav-inner {
+      display: flex;
+      align-items: stretch;
+      min-width: max-content;
+      padding: 0 8px;
+    }
+
+    .main-tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      cursor: pointer;
+      border: none;
+      border-bottom: 3px solid transparent;
+      background: transparent;
+      font-family: 'Roboto', Helvetica, sans-serif;
+      font-size: 15px;
+      font-weight: 300;
+      color: #62560e;
+      white-space: nowrap;
+      outline: none;
+      min-height: 50px;
+      transition: background-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .main-tab .m-icon {
+      flex-shrink: 0;
+      color: #62560e;
+      display: flex;
+      align-items: center;
+      transition: color 0.1s;
+    }
+
+    .main-tab .m-label {
+      transition: color 0.1s;
+      letter-spacing: 0.03em;
+    }
+
+    /* Hover: red text, weight STAYS at 300 */
+    .main-tab:hover { background-color: rgba(255, 255, 255, 0.22); }
+    .main-tab:hover .m-label { color: #d74134; font-weight: 300; }
+    .main-tab:hover .m-icon  { color: #d74134; }
+
+    /* Active: red text, weight 400 */
+    .main-tab.active {
+      background-color: rgba(255, 255, 255, 0.28);
+      border-bottom-color: #d74134;
+    }
+    .main-tab.active .m-label { color: #d74134; font-weight: 400; }
+    .main-tab.active .m-icon  { color: #d74134; }
+
+    /* ================================================================
+       SUB NAV — second gold bar with 3 tabs
+    ================================================================ */
+    .sub-nav-bar {
+      background: linear-gradient(to bottom, #d4b400 0%, #c8a800 100%);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    }
+
+    .sub-nav-inner {
+      display: flex;
+      align-items: center;
+      gap: 80px;
+      padding: 0 40px;
+      min-height: 55px;
+      justify-content: center;
+    }
+
+    .sub-tab {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      padding: 8px 0;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Icon swap on hover */
+    .sub-icon          { display: block; flex-shrink: 0; }
+    .sub-icon-hover    { display: none; }
+    .sub-tab:hover .sub-icon-default { display: none; }
+    .sub-tab:hover .sub-icon-hover   { display: block; }
+
+    .sub-label {
+      font-family: 'Roboto', Helvetica, sans-serif;
+      font-size: 20px;
+      font-weight: 300;
+      line-height: 1.3;
+      color: #62560e;
+      white-space: nowrap;
+      transition: color 0.1s;
+    }
+
+    /* Hover: red, weight 300 */
+    .sub-tab:hover .sub-label { color: #d74134; font-weight: 300; }
+
+    /* Active: red, weight 400 */
+    .sub-tab.active .sub-label { color: #d74134; font-weight: 400; }
+    .sub-tab.active { border-bottom-color: #d74134; }
+
+    .nav-hand-img { flex-shrink: 0; margin-left: 8px; }
+
+    /* ================================================================
+       PAGE BODY
+    ================================================================ */
+    .page-body {
+      background: #fffcec;
+      min-height: 700px;
+    }
+
+    /* ================================================================
+       FORM CARD
+    ================================================================ */
+    .content {
+      padding: 36px 39px 0;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 4px;
+    }
+
+    .card-inner {
+      padding: 30px 22px 23px;
+    }
+
+    h1.card-title {
+      font-family: 'Roboto', Helvetica, sans-serif;
+      font-size: 27px;
+      font-weight: 400;
+      line-height: 37px;
+      color: #62560e;
+    }
+
+    /* -- Row 1 -- */
+    .form-row1 {
+      margin-top: 25px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .date-box {
+      display: flex;
+      height: 50px;
+      width: 240px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      border: 1px solid rgba(98,86,14,0.45);
+      background: #fff;
+      padding: 0 14px;
+      flex-shrink: 0;
+    }
+
+    .date-box-inner {
+      font-family: 'Roboto', Helvetica, sans-serif;
+      font-size: 21.6px;
+      line-height: 29.6px;
+      white-space: nowrap;
+    }
+
+    .date-lbl { font-weight: 200; color: #62560e; }
+    .date-val  { font-weight: 400; color: #0087fc; }
+
+    .chk-label {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      margin-left: 7px;
+    }
+    .chk-label + .chk-label { margin-left: 16px; }
+
+    .chk-label input[type="checkbox"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 26px;
+      height: 26px;
+      border: 0.5px solid #85858a;
+      border-radius: 3px;
+      background: #fff;
+      cursor: pointer;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .chk-label input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 8px;
+      width: 7px;
+      height: 13px;
+      border: 2px solid #62560e;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
+    }
+
+    .chk-label span {
+      font-family: 'Roboto', Helvetica, sans-serif;
+      font-size: 21.6px;
+      font-weight: 300;
+      line-height: 1;
+      color: #62560e;
+      white-space: nowrap;
+    }
+
+    /* -- Row 2 -- */
+    .form-row2 {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 487px 1fr 196px;
+      align-items: end;
+      gap: 10px;
+    }
+
+    .form-field > label {
+      display: block;
+      font-family: 'Roboto', Helvetica, sans-serif;
+      font-size: 21.6px;
+      font-weight: 300;
+      line-height: 25.9px;
+      color: #62560e;
+      margin-bottom: 10px;
+      padding-left: 8px;
+    }
+
+    .select-wrap { position: relative; }
+
+    .form-select {
+      width: 100%;
+      height: 50px;
+      border-radius: 6px;
+      border: 1px solid rgba(98,86,14,0.45);
+      background: #fffefb;
+      padding: 0 44px 0 16px;
+      font-family: 'Roboto', Helvetica, sans-serif;
+      font-size: 18px;
+      color: #62560e;
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .select-arrow {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      width: 18px;
+      height: 10px;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 50px;
+      border-radius: 6px;
+      border: 1px solid rgba(98,86,14,0.45);
+      background: #fffefb;
+      padding: 0 16px;
+      font-family: 'Roboto', Helvetica, sans-serif;
+      font-size: 18px;
+      color: #62560e;
+      outline: none;
+      box-shadow: none;
+    }
+
+    .btn-import {
+      height: 50px;
+      border-radius: 6px;
+      background: #ffee80;
+      border: 1px solid rgba(98,86,14,0.3);
+      padding: 0 20px;
+      width: 100%;
+      font-family: 'Roboto', Helvetica, sans-serif;
+      font-size: 21.6px;
+      font-weight: 300;
+      line-height: 25.9px;
+      color: #62560e;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .btn-import:hover { background: #ffe84d; }
+
+    .yellow-bar {
+      height: 50px;
+      width: 100%;
+      background: #fff7bb;
+    }
+
+    /* ================================================================
+       RESPONSIVE
+    ================================================================ */
+    @media (max-width: 1100px) {
+      .sub-nav-inner { gap: 40px; padding: 0 24px; }
+      .form-row2 { grid-template-columns: 1fr 1fr 196px; }
+    }
+
+    @media (max-width: 860px) {
+      .sub-nav-inner { gap: 20px; padding: 0 16px; justify-content: flex-start; }
+      .sub-label { font-size: 15px; }
+      .form-row2 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .sub-nav-inner { gap: 12px; }
+      .sub-label { font-size: 13px; }
+      .nav-hand-img { display: none; }
+      .content { padding: 20px 16px 0; }
+      .form-row1 { gap: 8px; }
+      .date-box { width: 100%; max-width: 280px; }
+      h1.card-title { font-size: 20px; }
+      .chk-label span { font-size: 15px; }
+      .chk-label { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================
+       PRIMARY NAV BAR (gold, 6 interactive tabs)
+  ======================================================== -->
+  <nav class="main-nav" aria-label="Основная навигация">
+    <div class="main-nav-inner">
+
+      <button class="main-tab" data-tab="journal" type="button">
+        <span class="m-icon"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="1" width="16" height="22" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/>
+  <line x1="5.5" y1="7" x2="14.5" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="5.5" y1="11" x2="14.5" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="5.5" y1="15" x2="11" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="20" cy="20" r="5" fill="#f5d800" stroke="currentColor" stroke-width="1.5"/>
+  <line x1="20" y1="17.5" x2="20" y2="20.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="20" cy="22" r="0.7" fill="currentColor"/>
+</svg></span>
+        <span class="m-label">ЖУРНАЛ МЕНЕДЖЕРОВ</span>
+      </button>
+
+      <button class="main-tab" data-tab="resume" type="button">
+        <span class="m-icon"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAAoVJREFUeAHNV+1x2kAQ3V3hGf90KkCpIHRguQKcCpIOXAJOBU4H0AFJBZAK4g6sVAD/AV12VwIj6XS6O8sfb+YGOO2t3t1+vAMgEAbgisfUIC4N0ZNJEqODaMNzK372jccYXhNKgCg/vbxrCEEmBK8BMxrNegm0CT3AkIgiMTQZjXksiePgkPa9B3uJcE4A4suSz5gci+Kzy4Sc62UnLyUhQEzZ1zXEEoEkubXOG7Ng5/cQAqLvEAuO76oj5npK5uLijn9vPJP2L8Si1rCeHd7XbADSTsKN3gKxaO2W6M5hK9XlanYbiIG28mcnT9xLMq91JaFlR0ivIBSS5bqYNcXybFqNcY14qTOnniHk5RRPoeupHDuR0oGEY94gMTkL1axlX77wS8PXrC+03USOx8uK2nomu7+8TK3zluN3+XKTqOeH6kWMtGtF8YmeJ2xQnlj1hegnBKIWLo/KsznIhyg/qx/ffuKU/IDLjlO1LafS1hrEbad37qo+MVYboh8Ok0/gg6ptz41NRzwyn+0WttBq0nc0xv77iCwsCukLKZ/WhD8zVt9Hnrvlxf+aG2DFnqsNwFrtAHKe+4O73aPrPSMnCTni/X7MBDIeOR4ON9qskuQ3iK4UxS+eL18gNsYI0S1/v8H9fs2beGDCE9jtJNxOIl0ErrX+5S9CIyynK0CpKStV6FKlV1quVVMzTUUWX+LTp817SXr1V8HaQYWAtPPmBtp5tmw2SDwnwZm+DroaFoXY56UnTDU0iH6dk++xvD475hlGkxgCZ2TKPpIkszcnIZBTRFzoV5F1JhJ/nxwCh0NGTCL8jjA0iL5SVfvvjSlpnN4bXGkodQ0fAKNKD8Jv18Ni+x/Jx2lGfFdswgAAAABJRU5ErkJggg==" width="28" height="28" alt="" /></span>
+        <span class="m-label">РЕЗЮМЕ</span>
+      </button>
+
+      <button class="main-tab" data-tab="companies" type="button">
+        <span class="m-icon"><svg width="30" height="26" viewBox="0 0 30 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="8" width="11" height="17" rx="1" stroke="currentColor" stroke-width="1.8" fill="none"/>
+  <rect x="13" y="2" width="14" height="23" rx="1" stroke="currentColor" stroke-width="1.8" fill="none"/>
+  <line x1="4.5" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  <line x1="4.5" y1="16" x2="9" y2="16" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  <line x1="4.5" y1="20" x2="9" y2="20" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  <line x1="16" y1="6" x2="24" y2="6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  <line x1="16" y1="10" x2="24" y2="10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  <line x1="16" y1="14" x2="24" y2="14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  <rect x="17" y="18" width="5" height="7" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/>
+</svg></span>
+        <span class="m-label">КОМПАНИИ</span>
+      </button>
+
+      <button class="main-tab active" data-tab="import" type="button">
+        <span class="m-icon"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M13 2 L13 17" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M6 11 L13 18 L20 11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M2 21 L2 24 L24 24 L24 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></span>
+        <span class="m-label">ИМПОРТ</span>
+      </button>
+
+      <button class="main-tab" data-tab="ads" type="button">
+        <span class="m-icon"><svg width="28" height="26" viewBox="0 0 28 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M4 9 L4 17 L8 17 L8 9 Z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
+  <path d="M8 9 L23 3.5 L23 22.5 L8 17 Z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
+  <path d="M8 17 L8 23 L12 23 L12 17" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+</svg></span>
+        <span class="m-label">ОБЪЯВЛЕНИЯ</span>
+      </button>
+
+      <button class="main-tab" data-tab="email-letters" type="button">
+        <span class="m-icon"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC8AAAAiCAYAAADPuYByAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAAiVJREFUeAHtV+FVwjAQvjv7w3/iBOIE6gTiBNQJcAPdAJ1AnUCdADcAN8AJ6AawAD2/S4tUaAtC+wq8fu+lSa+59Esud7mwHh0p7SmE9hg1+argpUqZvykM+2hNlr6JNEj1gXYAnOqwIMdh+JqlBJ0xqgYVBdUhFuw1p0cbxV8Ucma0UQ0oC8xNKhJhOGDVm6zPKtLFPx8X5V6WQuEES0Denu/RdvAxziWViHTyYfiJPf9EWwCmtqoC8sxd+EKXdhwHGOeJBigftClUT2A9C20tKhFexs+/sOffaUMg9p65w4y5tZaCyKVGh2IWmmlCrrPKilCTrwoHGSq3wQTR6hN1QJZ5Mt+SRZ8yYNGmsOJ5Q00hCnk30W9sWSJkLdT37n3+rY/io3RQglX/K5L8SHNyfJB9jvu5vHw2SdRNRxoTid8bsxryN5SeHh8344mVRr6da+GIzFiZe46Q6Yg8JyfsVlzELDNKWtBNUGTJEoUdUjyd8qo+tpKo7v4Kcemxm5SdyIvpBLLbaHCc1MxLVi3DYf8Hu/RkXXxE/DzVwkKlrhNRVC2/D0D2xllK5MqtegS77Ps0nZ6inKPPS0JvmD5eUXse+5fyJ3ft+hFduP1P1LEJu7ZFHcjjfu1fZ46iTidu98t0WJ1FjBTic4czZzSnnLXnUaeRiEjj5FhxSNXSHHbOVN8pSqcD9y5yh+dDmsMldIJNLvx1SlwVavJVwYOzPNKe4gejRtZ+6lYp9AAAAABJRU5ErkJggg==" width="38" height="28" alt="" /></span>
+        <span class="m-label">EMAIL ПИСЬМА</span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- ========================================================
+       SECONDARY NAV BAR (darker gold, 3 sub-tabs)
+  ======================================================== -->
+  <nav class="sub-nav-bar" aria-label="Подразделы">
+    <div class="sub-nav-inner">
+
+      <button class="sub-tab active" data-sub="resume" type="button">
+        <img class="sub-icon sub-icon-default" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAAoVJREFUeAHNV+1x2kAQ3V3hGf90KkCpIHRguQKcCpIOXAJOBU4H0AFJBZAK4g6sVAD/AV12VwIj6XS6O8sfb+YGOO2t3t1+vAMgEAbgisfUIC4N0ZNJEqODaMNzK372jccYXhNKgCg/vbxrCEEmBK8BMxrNegm0CT3AkIgiMTQZjXksiePgkPa9B3uJcE4A4suSz5gci+Kzy4Sc62UnLyUhQEzZ1zXEEoEkubXOG7Ng5/cQAqLvEAuO76oj5npK5uLijn9vPJP2L8Si1rCeHd7XbADSTsKN3gKxaO2W6M5hK9XlanYbiIG28mcnT9xLMq91JaFlR0ivIBSS5bqYNcXybFqNcY14qTOnniHk5RRPoeupHDuR0oGEY94gMTkL1axlX77wS8PXrC+03USOx8uK2nomu7+8TK3zluN3+XKTqOeH6kWMtGtF8YmeJ2xQnlj1hegnBKIWLo/KsznIhyg/qx/ffuKU/IDLjlO1LafS1hrEbad37qo+MVYboh8Ok0/gg6ptz41NRzwyn+0WttBq0nc0xv77iCwsCukLKZ/WhD8zVt9Hnrvlxf+aG2DFnqsNwFrtAHKe+4O73aPrPSMnCTni/X7MBDIeOR4ON9qskuQ3iK4UxS+eL18gNsYI0S1/v8H9fs2beGDCE9jtJNxOIl0ErrX+5S9CIyynK0CpKStV6FKlV1quVVMzTUUWX+LTp817SXr1V8HaQYWAtPPmBtp5tmw2SDwnwZm+DroaFoXY56UnTDU0iH6dk++xvD475hlGkxgCZ2TKPpIkszcnIZBTRFzoV5F1JhJ/nxwCh0NGTCL8jjA0iL5SVfvvjSlpnN4bXGkodQ0fAKNKD8Jv18Ni+x/Jx2lGfFdswgAAAABJRU5ErkJggg==" width="32" height="32" alt="" />
+        <img class="sub-icon sub-icon-hover"   src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAAoVJREFUeAHNV+1x2kAQ3V3hGf90KkCpIHRguQKcCpIOXAJOBU4H0AFJBZAK4g6sVAD/AV12VwIj6XS6O8sfb+YGOO2t3t1+vAMgEAbgisfUIC4N0ZNJEqODaMNzK372jccYXhNKgCg/vbxrCEEmBK8BMxrNegm0CT3AkIgiMTQZjXksiePgkPa9B3uJcE4A4suSz5gci+Kzy4Sc62UnLyUhQEzZ1zXEEoEkubXOG7Ng5/cQAqLvEAuO76oj5npK5uLijn9vPJP2L8Si1rCeHd7XbADSTsKN3gKxaO2W6M5hK9XlanYbiIG28mcnT9xLMq91JaFlR0ivIBSS5bqYNcXybFqNcY14qTOnniHk5RRPoeupHDuR0oGEY94gMTkL1axlX77wS8PXrC+03USOx8uK2nomu7+8TK3zluN3+XKTqOeH6kWMtGtF8YmeJ2xQnlj1hegnBKIWLo/KsznIhyg/qx/ffuKU/IDLjlO1LafS1hrEbad37qo+MVYboh8Ok0/gg6ptz41NRzwyn+0WttBq0nc0xv77iCwsCukLKZ/WhD8zVt9Hnrvlxf+aG2DFnqsNwFrtAHKe+4O73aPrPSMnCTni/X7MBDIeOR4ON9qskuQ3iK4UxS+eL18gNsYI0S1/v8H9fs2beGDCE9jtJNxOIl0ErrX+5S9CIyynK0CpKStV6FKlV1quVVMzTUUWX+LTp817SXr1V8HaQYWAtPPmBtp5tmw2SDwnwZm+DroaFoXY56UnTDU0iH6dk++xvD475hlGkxgCZ2TKPpIkszcnIZBTRFzoV5F1JhJ/nxwCh0NGTCL8jjA0iL5SVfvvjSlpnN4bXGkodQ0fAKNKD8Jv18Ni+x/Jx2lGfFdswgAAAABJRU5ErkJggg==" width="32" height="32" alt="" />
+        <span class="sub-label">РЕЗЮМЕ</span>
+      </button>
+
+      <button class="sub-tab" data-sub="email-letters" type="button">
+        <img class="sub-icon sub-icon-default" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC8AAAAiCAYAAADPuYByAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAAiVJREFUeAHtV+FVwjAQvjv7w3/iBOIE6gTiBNQJcAPdAJ1AnUCdADcAN8AJ6AawAD2/S4tUaAtC+wq8fu+lSa+59Esud7mwHh0p7SmE9hg1+argpUqZvykM+2hNlr6JNEj1gXYAnOqwIMdh+JqlBJ0xqgYVBdUhFuw1p0cbxV8Ucma0UQ0oC8xNKhJhOGDVm6zPKtLFPx8X5V6WQuEES0Denu/RdvAxziWViHTyYfiJPf9EWwCmtqoC8sxd+EKXdhwHGOeJBigftClUT2A9C20tKhFexs+/sOffaUMg9p65w4y5tZaCyKVGh2IWmmlCrrPKilCTrwoHGSq3wQTR6hN1QJZ5Mt+SRZ8yYNGmsOJ5Q00hCnk30W9sWSJkLdT37n3+rY/io3RQglX/K5L8SHNyfJB9jvu5vHw2SdRNRxoTid8bsxryN5SeHh8344mVRr6da+GIzFiZe46Q6Yg8JyfsVlzELDNKWtBNUGTJEoUdUjyd8qo+tpKo7v4Kcemxm5SdyIvpBLLbaHCc1MxLVi3DYf8Hu/RkXXxE/DzVwkKlrhNRVC2/D0D2xllK5MqtegS77Ps0nZ6inKPPS0JvmD5eUXse+5fyJ3ft+hFduP1P1LEJu7ZFHcjjfu1fZ46iTidu98t0WJ1FjBTic4czZzSnnLXnUaeRiEjj5FhxSNXSHHbOVN8pSqcD9y5yh+dDmsMldIJNLvx1SlwVavJVwYOzPNKe4gejRtZ+6lYp9AAAAABJRU5ErkJggg==" width="44" height="32" alt="" />
+        <img class="sub-icon sub-icon-hover"   src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC8AAAAiCAYAAADPuYByAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAAiVJREFUeAHtV+FVwjAQvjv7w3/iBOIE6gTiBNQJcAPdAJ1AnUCdADcAN8AJ6AawAD2/S4tUaAtC+wq8fu+lSa+59Esud7mwHh0p7SmE9hg1+argpUqZvykM+2hNlr6JNEj1gXYAnOqwIMdh+JqlBJ0xqgYVBdUhFuw1p0cbxV8Ucma0UQ0oC8xNKhJhOGDVm6zPKtLFPx8X5V6WQuEES0Denu/RdvAxziWViHTyYfiJPf9EWwCmtqoC8sxd+EKXdhwHGOeJBigftClUT2A9C20tKhFexs+/sOffaUMg9p65w4y5tZaCyKVGh2IWmmlCrrPKilCTrwoHGSq3wQTR6hN1QJZ5Mt+SRZ8yYNGmsOJ5Q00hCnk30W9sWSJkLdT37n3+rY/io3RQglX/K5L8SHNyfJB9jvu5vHw2SdRNRxoTid8bsxryN5SeHh8344mVRr6da+GIzFiZe46Q6Yg8JyfsVlzELDNKWtBNUGTJEoUdUjyd8qo+tpKo7v4Kcemxm5SdyIvpBLLbaHCc1MxLVi3DYf8Hu/RkXXxE/DzVwkKlrhNRVC2/D0D2xllK5MqtegS77Ps0nZ6inKPPS0JvmD5eUXse+5fyJ3ft+hFduP1P1LEJu7ZFHcjjfu1fZ46iTidu98t0WJ1FjBTic4czZzSnnLXnUaeRiEjj5FhxSNXSHHbOVN8pSqcD9y5yh+dDmsMldIJNLvx1SlwVavJVwYOzPNKe4gejRtZ+6lYp9AAAAABJRU5ErkJggg==" width="44" height="32" alt="" />
+        <span class="sub-label">EMAIL&nbsp;&nbsp;ПИСЬМА</span>
+      </button>
+
+      <button class="sub-tab" data-sub="email-settings" type="button">
+        <img class="sub-icon sub-icon-default" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACcAAAAiCAYAAADcbsCGAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAAw5JREFUeAHNV91x4jAQXgkzw9vRAe4gdABXAVwFpIOkg5AKkqsAUkFIBdBBuApwKsB5ywO2bldaGazIYJu/7MyOZf2sP+2/BSApgAFIOQYhunBJUipivhcA/9xlgcBG0GhM4boUQ5L0XYASNXYP16c2Wm3sTkqcDOEnkMelJBDqPEXIH3BeWpT5hvw2o9QL2r+LzyWch2YiSX7jc35wp2o0lMNrDJIb5LaS8t2zXp+DYKnlYnb4tiblysUmPXjbGL0LfP6CNP0DpzNxBJtNH58dDMJpmQOyYL6NAhZAKRBDHI4HGLEckvuGzt8uc0gWrlAUG4AxC47hOGBCyxOiU/ag3LtqAM6PABjXBXYYnAHYRZ5w9q6SsC2wTwQ2qwpMU+lIk3LC+0clz4x4/2tJ+av64IyAsT4TBA8H9t3xvqcKskulkmISQgsQm82jrxaa26pHkaZ/+a1uELGs8pozZiKtWQ2SiSlR461xPHf23GVjoxl63iJPdl0lm6tp1jV+oM8fenJNnJNF2d+zRzWbXbueXQqrUG6OfboKuFVWyrDn8/jJWgkxZw3M9XuR/2HfaAFzCQtZ2wrHPUWVowI4AtbhGrusYH6jbWPGYaY1KaPcpfIXeAYPCVr0zEfHJE/d1ZiSR+dCCALqcsZ7TlBOHNpx1hHv0ViYu20FZk091DnLZtb+6O/n6LZ1NGZFkMbSdFmoJeoV9/eLH1Zz69o3LOYBB5EbHM9qp/PmoIicPe92Xepfs1MSJeEkecOecODMLzE5U23uYYS/EsO2Jdsma2w2sshV5WvlYbb111/eBqyp3f0rxjBx58nvJN6SfOwWTtHxCrHQZvNFphCf4OYy++fnWs+0atNAjw3AFy241SrVpXrp64vSQKwoLZgf9a2sNKUIpO/YFENzMwbj/hZGuDaEc5HPhFlloDSDlYPfbzyprL6CaoHbAuzxeptBrn1+eG5w9QONNVetn6tCjQbUpBiazRAuQarVCnUa2a+tld6HDNcgZdsjw/NcZfD1chcGN1CmlbL9XciN6drbyyH9B3dwnBAM6N1XAAAAAElFTkSuQmCC" width="36" height="32" alt="" />
+        <img class="sub-icon sub-icon-hover"   src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACcAAAAiCAYAAADcbsCGAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAAw5JREFUeAHNV91x4jAQXgkzw9vRAe4gdABXAVwFpIOkg5AKkqsAUkFIBdBBuApwKsB5ywO2bldaGazIYJu/7MyOZf2sP+2/BSApgAFIOQYhunBJUipivhcA/9xlgcBG0GhM4boUQ5L0XYASNXYP16c2Wm3sTkqcDOEnkMelJBDqPEXIH3BeWpT5hvw2o9QL2r+LzyWch2YiSX7jc35wp2o0lMNrDJIb5LaS8t2zXp+DYKnlYnb4tiblysUmPXjbGL0LfP6CNP0DpzNxBJtNH58dDMJpmQOyYL6NAhZAKRBDHI4HGLEckvuGzt8uc0gWrlAUG4AxC47hOGBCyxOiU/ag3LtqAM6PABjXBXYYnAHYRZ5w9q6SsC2wTwQ2qwpMU+lIk3LC+0clz4x4/2tJ+av64IyAsT4TBA8H9t3xvqcKskulkmISQgsQm82jrxaa26pHkaZ/+a1uELGs8pozZiKtWQ2SiSlR461xPHf23GVjoxl63iJPdl0lm6tp1jV+oM8fenJNnJNF2d+zRzWbXbueXQqrUG6OfboKuFVWyrDn8/jJWgkxZw3M9XuR/2HfaAFzCQtZ2wrHPUWVowI4AtbhGrusYH6jbWPGYaY1KaPcpfIXeAYPCVr0zEfHJE/d1ZiSR+dCCALqcsZ7TlBOHNpx1hHv0ViYu20FZk091DnLZtb+6O/n6LZ1NGZFkMbSdFmoJeoV9/eLH1Zz69o3LOYBB5EbHM9qp/PmoIicPe92Xepfs1MSJeEkecOecODMLzE5U23uYYS/EsO2Jdsma2w2sshV5WvlYbb111/eBqyp3f0rxjBx58nvJN6SfOwWTtHxCrHQZvNFphCf4OYy++fnWs+0atNAjw3AFy241SrVpXrp64vSQKwoLZgf9a2sNKUIpO/YFENzMwbj/hZGuDaEc5HPhFlloDSDlYPfbzyprL6CaoHbAuzxeptBrn1+eG5w9QONNVetn6tCjQbUpBiazRAuQarVCnUa2a+tld6HDNcgZdsjw/NcZfD1chcGN1CmlbL9XciN6drbyyH9B3dwnBAM6N1XAAAAAElFTkSuQmCC" width="36" height="32" alt="" />
+        <span class="sub-label">EMAIL&nbsp;&nbsp;НАСТРОЙКИ</span>
+      </button>
+
+      <img class="nav-hand-img" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAxOCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTYuNzA0MDUgMEM1LjQ3MzMgMCA0LjQ1ODg5IDEuMTYxODMgNC40NTg4OSAyLjU3MTQzVjEyLjY5NjRMMy45Njc3NiAxMi4xMDcxTDMuNzgwNjYgMTEuOTE5NkMyLjkxODI3IDEwLjkzMTkgMS41MDkyIDEwLjkzMTkgMC42NDY3OTkgMTEuOTE5NkMtMC4yMTU2IDEyLjkwNzQgLTAuMjE1NiAxNC41MjEyIDAuNjQ2Nzk5IDE1LjUwODlWMTUuNTM1N0w2Ljc3NDIxIDIyLjQ3MzJMNi44MjA5OCAyMi41TDYuODQ0MzcgMjIuNTUzNkM3Ljg1Mjk0IDIzLjQyMDggOS4xMzkyMyAyNCAxMC41ODYzIDI0SDExLjg3MjZDMTUuMjY2NiAyNCAxOCAyMC44Njk0IDE4IDE2Ljk4MjFWMTAuMjg1N0MxOCA4Ljg3NjEyIDE2Ljk4NTYgNy43MTQyOSAxNS43NTQ4IDcuNzE0MjlDMTUuNDM2MiA3LjcxNDI5IDE1LjE0MDkgNy44MTQ3MyAxNC44NjYxIDcuOTU1MzZDMTQuNjIwNiA2Ljg0MDQgMTMuNzM0OCA2IDEyLjY5MTEgNkMxMi4xMTgyIDYgMTEuNTkxOSA2LjI1NzgxIDExLjE5NDQgNi42Njk2NEMxMC43OTY4IDYuMjU3ODEgMTAuMjcwNiA2IDkuNjk3NTkgNkM5LjQzNDQ5IDYgOS4xODYgNi4wNjM2MiA4Ljk0OTIxIDYuMTYwNzFWMi41NzE0M0M4Ljk0OTIxIDEuMTYxODMgNy45MzQ3OSAwIDYuNzA0MDUgMFpNNi43MDQwNSAxLjcxNDI5QzcuMTE5MTcgMS43MTQyOSA3LjQ1MjQzIDIuMDk1OTggNy40NTI0MyAyLjU3MTQzVjEySDguOTQ5MjFWOC41NzE0M0M4Ljk0OTIxIDguMDk1OTggOS4yODI0NyA3LjcxNDI5IDkuNjk3NTkgNy43MTQyOUMxMC4xMTI3IDcuNzE0MjkgMTAuNDQ2IDguMDk1OTggMTAuNDQ2IDguNTcxNDNWMTJIMTEuOTQyN1Y4LjU3MTQzQzExLjk0MjcgOC4wOTU5OCAxMi4yNzYgNy43MTQyOSAxMi42OTExIDcuNzE0MjlDMTMuMTA2MyA3LjcxNDI5IDEzLjQzOTUgOC4wOTU5OCAxMy40Mzk1IDguNTcxNDNWMTJIMTUuMDA2NVYxMC4yODU3QzE1LjAwNjUgOS44MTAyNyAxNS4zMzk3IDkuNDI4NTcgMTUuNzU0OCA5LjQyODU3QzE2LjE3IDkuNDI4NTcgMTYuNTAzMiA5LjgxMDI3IDE2LjUwMzIgMTAuMjg1N1YxNi45ODIxQzE2LjUwMzIgMTkuOTUyIDE0LjQ2NTYgMjIuMjg1NyAxMS44NzI2IDIyLjI4NTdIMTAuNTg2M0M5LjQ5MDAzIDIyLjI4NTcgOC41NDI4NiAyMS44MzcxIDcuNzU2NDcgMjEuMTYwN0wxLjY5OTIyIDE0LjMwMzZDMS4zNjU5NSAxMy45MjE5IDEuMzY1OTUgMTMuNTA2NyAxLjY5OTIyIDEzLjEyNUMyLjAzMjQ4IDEyLjc0MzMgMi4zOTQ5OCAxMi43NDMzIDIuNzI4MjUgMTMuMTI1TDUuOTU1NjYgMTYuODIxNFYyLjU3MTQzQzUuOTU1NjYgMi4wOTU5OCA2LjI4ODkzIDEuNzE0MjkgNi43MDQwNSAxLjcxNDI5WiIgZmlsbD0iIzBGMEYwRiIvPgo8L3N2Zz4K" width="16" height="22" alt="" />
+
+    </div>
+  </nav>
+
+  <!-- ========================================================
+       PAGE CONTENT
+  ======================================================== -->
+  <div class="page-body">
+    <div class="content">
+      <div class="card">
+        <div class="card-inner">
+
+          <h1 class="card-title">Импорт&nbsp;&nbsp;из xml/xlsx/dosx</h1>
+
+          <div class="form-row1">
+            <div class="date-box">
+              <div class="date-box-inner">
+                <span class="date-lbl">ДАТА ОТ&nbsp;</span><span class="date-val">12.05.2023</span>
+              </div>
+            </div>
+            <div class="date-box">
+              <div class="date-box-inner">
+                <span class="date-lbl">ДАТА ДО&nbsp;</span><span class="date-val">12.05.2023</span>
+              </div>
+            </div>
+            <label class="chk-label">
+              <input type="checkbox" id="importAll" />
+              <span>Все импортировать оъявления</span>
+            </label>
+            <label class="chk-label">
+              <input type="checkbox" id="skipDuplicates" />
+              <span>Не проверять на повторы</span>
+            </label>
+          </div>
+
+          <div class="form-row2">
+            <div class="form-field">
+              <label for="fileType">Укажите тип файла</label>
+              <div class="select-wrap">
+                <select class="form-select" id="fileType">
+                  <option value="xml">xml</option>
+                  <option value="xlsx">xlsx</option>
+                  <option value="dosx">dosx</option>
+                </select>
+                <img class="select-arrow" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTAiIHZpZXdCb3g9IjAgMCAxOCAxMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjQ1NzcgMC41Nzg0ODVMOSA4LjUwNzU2TDAuNTQyMzE3IDAuNTc4NDg1IiBzdHJva2U9IiM2MjU2MEUiIHN0cm9rZS13aWR0aD0iMS41Ii8+Cjwvc3ZnPgo=" alt="" />
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="filePath">Укажите путь к файлу</label>
+              <input class="form-input" type="text" id="filePath" />
+            </div>
+            <button class="btn-import" type="button">Начать Импорт</button>
+          </div>
+
+        </div>
+      </div>
+      <div class="yellow-bar"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // Primary nav tabs
+      var mainTabs = document.querySelectorAll('.main-tab');
+      mainTabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          mainTabs.forEach(function (t) { t.classList.remove('active'); });
+          this.classList.add('active');
+        });
+      });
+
+      // Secondary nav tabs
+      var subTabs = document.querySelectorAll('.sub-tab');
+      subTabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          subTabs.forEach(function (t) { t.classList.remove('active'); });
+          this.classList.add('active');
+        });
+      });
+
+    }());
+  </script>
+
+</body>
+</html>
